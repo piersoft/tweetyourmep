@@ -64,14 +64,15 @@ db.once('open', function() {
   var json_file_content = JSON.parse(fs.readFileSync(mep_file, 'utf8'));
 
   var mep_left = json_file_content.length;
-
+  var mepCounter=0;
+  var mepCounterLast=0;
   for(var i in json_file_content) {
 
     mepCounter +=1 ;
 
     var mep_doc = model_adapter(json_file_content[i]);
 
-    console.log("#### MEP ID: " + mep_doc.mep_userId);
+    console.log("#### MEP ID: " + mep_doc.mep_userId + " di "+mepCounter);
 
     // save / update
 
@@ -82,7 +83,9 @@ db.once('open', function() {
       { new: true, upsert: true }
     ).exec()
     .then(function(doc){
+      mepCounterLast +=1;
       console.log("added MEP.id=" + doc.mep_userId);
+      if (mepCounterLast===mep_left) db.close();
     })
     .catch(function(err){
       console.log("can't find MEP.id=" + doc.mep_userId);
